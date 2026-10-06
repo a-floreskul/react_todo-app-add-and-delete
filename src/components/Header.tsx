@@ -3,14 +3,14 @@ import { useState } from 'react';
 
 type Props = {
   allCompleted: boolean;
-  onAdd: (title: string) => void;
+  onAdd: (title: string) => Promise<boolean>;
   onError: (message: string) => void;
 };
 
 export const Header: React.FC<Props> = ({ allCompleted, onAdd, onError }) => {
   const [title, setTitle] = useState('');
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedTitle = title.trim();
@@ -21,8 +21,11 @@ export const Header: React.FC<Props> = ({ allCompleted, onAdd, onError }) => {
       return;
     }
 
-    onAdd(trimmedTitle);
-    setTitle('');
+    const isSuccess = await onAdd(trimmedTitle);
+
+    if (isSuccess) {
+      setTitle('');
+    }
   };
 
   return (

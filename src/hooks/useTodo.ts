@@ -57,9 +57,15 @@ export const useTodos = () => {
     return addTodo(data)
       .then(newTodo => {
         setTodos(currentTodos => [...currentTodos, newTodo]);
-        setTmpTodo(null);
+
+        return true;
       })
-      .catch(() => setErrorMessage('Unable to add a todo'));
+      .catch(() => {
+        setErrorMessage('Unable to add a todo');
+
+        return false;
+      })
+      .finally(() => setTmpTodo(null));
   };
 
   return {
