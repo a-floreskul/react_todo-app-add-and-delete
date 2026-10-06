@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getTodos, USER_ID } from '../api/todos';
+import { getTodos, addTodo, USER_ID } from '../api/todos';
 import { Filter } from '../types/Filter';
 import { Todo } from '../types/Todo';
 
@@ -18,6 +18,7 @@ export const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [filter, setFilter] = useState<Filter>(Filter.All);
+  const [tmpTodo, setTmpTodo] = useState<Todo | null>(null);
 
   useEffect(() => {
     if (!USER_ID) {
@@ -44,6 +45,23 @@ export const useTodos = () => {
   const activeCount = todos.filter(todo => !todo.completed).length;
   const hasCompleted = todos.some(todo => todo.completed);
 
+  const createTodo = (title: string) => {
+    const data = {
+      userId: USER_ID,
+      title: title,
+      completed: false,
+    };
+
+    setTmpTodo({ ...data, id: 0 });
+
+    return addTodo(data)
+      .then(newTodo => {
+        setTodos(currentTodos => [...currentTodos, newTodo]);
+        setTmpTodo(null);
+      })
+      .catch(() => setErrorMessage('Unable to add a todo'));
+  };
+
   return {
     todos,
     visibleTodos,
@@ -53,5 +71,7 @@ export const useTodos = () => {
     setFilter,
     errorMessage,
     setErrorMessage,
+    createTodo,
+    tmpTodo,
   };
 };

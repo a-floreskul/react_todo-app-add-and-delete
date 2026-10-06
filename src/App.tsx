@@ -20,7 +20,11 @@ export const App: React.FC = () => {
     setFilter,
     errorMessage,
     setErrorMessage,
+    createTodo,
+    tmpTodo,
   } = useTodos();
+
+  const allCompleted = todos.length > 0 && todos.every(todo => todo.completed);
 
   if (!USER_ID) {
     return <UserWarning />;
@@ -31,9 +35,13 @@ export const App: React.FC = () => {
       <h1 className="todoapp__title">todos</h1>
 
       <div className="todoapp__content">
-        <Header allCompleted={true} />
+        <Header
+          allCompleted={allCompleted}
+          onAdd={createTodo}
+          onError={setErrorMessage}
+        />
 
-        <TodoList todos={visibleTodos} />
+        <TodoList todos={visibleTodos} currentTodo={tmpTodo} />
 
         {todos.length > 0 && (
           <Footer
