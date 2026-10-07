@@ -22,6 +22,9 @@ export const App: React.FC = () => {
     setErrorMessage,
     createTodo,
     tmpTodo,
+    deleteTodo,
+    loadingIds,
+    clearCompleted,
   } = useTodos();
 
   const allCompleted = todos.length > 0 && todos.every(todo => todo.completed);
@@ -39,9 +42,16 @@ export const App: React.FC = () => {
           allCompleted={allCompleted}
           onAdd={createTodo}
           onError={setErrorMessage}
+          isDisabled={!!tmpTodo}
+          todosCount={todos.length}
         />
 
-        <TodoList todos={visibleTodos} currentTodo={tmpTodo} />
+        <TodoList
+          todos={visibleTodos}
+          currentTodo={tmpTodo}
+          loadingIds={loadingIds}
+          onDelete={deleteTodo}
+        />
 
         {todos.length > 0 && (
           <Footer
@@ -49,6 +59,7 @@ export const App: React.FC = () => {
             todosCount={activeCount}
             onFilterChange={setFilter}
             hasCompleted={hasCompleted}
+            onClearCompleted={clearCompleted}
           />
         )}
       </div>

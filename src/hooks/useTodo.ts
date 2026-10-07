@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getTodos, addTodo, USER_ID } from '../api/todos';
+import { getTodos, addTodo, removeTodo, USER_ID } from '../api/todos';
 import { Filter } from '../types/Filter';
 import { Todo } from '../types/Todo';
 
@@ -19,6 +19,7 @@ export const useTodos = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [filter, setFilter] = useState<Filter>(Filter.All);
   const [tmpTodo, setTmpTodo] = useState<Todo | null>(null);
+  const [loadingIds, setLoadingIds] = useState<number[]>([]);
 
   useEffect(() => {
     if (!USER_ID) {
@@ -68,6 +69,31 @@ export const useTodos = () => {
       .finally(() => setTmpTodo(null));
   };
 
+  const deleteTodo = (todoId: number): Promise<boolean> => {
+    setLoadingIds(current => [...current, todoId]);
+
+    return removeTodo(todoId)
+      .then(() => {
+        setTodos(current => current.filter(todo => todo.id !== todoId));
+
+        return true;
+      })
+      .catch(() => {
+        setErrorMessage('Unable to delete a todo');
+
+        return false;
+      })
+      .finally(() => {
+        setLoadingIds(current => current.filter(id => id !== todoId));
+      });
+  };
+
+  const clearCompleted = () => {
+    const completedTodos = todos.filter(todo => todo.completed);
+
+    return Promise.all(completedTodos.map(todo => deleteTodo(todo.id)));
+  };
+
   return {
     todos,
     visibleTodos,
@@ -79,5 +105,8 @@ export const useTodos = () => {
     setErrorMessage,
     createTodo,
     tmpTodo,
+    deleteTodo,
+    loadingIds,
+    clearCompleted,
   };
 };

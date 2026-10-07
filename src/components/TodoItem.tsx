@@ -5,9 +5,14 @@ import { Todo } from '../types/Todo';
 type Props = {
   todo: Todo;
   isLoading?: boolean;
+  onDelete?: (todoId: number) => Promise<boolean>;
 };
 
-export const TodoItem: React.FC<Props> = ({ todo, isLoading = false }) => {
+export const TodoItem: React.FC<Props> = ({
+  todo,
+  isLoading = false,
+  onDelete,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(todo.title);
 
@@ -58,7 +63,12 @@ export const TodoItem: React.FC<Props> = ({ todo, isLoading = false }) => {
             {todo.title}
           </span>
 
-          <button type="button" className="todo__remove" data-cy="TodoDelete">
+          <button
+            type="button"
+            className="todo__remove"
+            data-cy="TodoDelete"
+            onClick={() => onDelete?.(todo.id)}
+          >
             ×
           </button>
         </>

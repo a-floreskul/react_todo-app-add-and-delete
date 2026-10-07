@@ -1,14 +1,29 @@
 import classNames from 'classnames';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Props = {
   allCompleted: boolean;
   onAdd: (title: string) => Promise<boolean>;
   onError: (message: string) => void;
+  isDisabled: boolean;
+  todosCount: number;
 };
 
-export const Header: React.FC<Props> = ({ allCompleted, onAdd, onError }) => {
+export const Header: React.FC<Props> = ({
+  allCompleted,
+  onAdd,
+  onError,
+  isDisabled,
+  todosCount,
+}) => {
   const [title, setTitle] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!isDisabled) {
+      inputRef.current?.focus();
+    }
+  }, [isDisabled, todosCount]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,12 +57,14 @@ export const Header: React.FC<Props> = ({ allCompleted, onAdd, onError }) => {
       <form onSubmit={handleSubmit}>
         <input
           data-cy="NewTodoField"
+          ref={inputRef}
           type="text"
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
           autoFocus
           value={title}
           onChange={event => setTitle(event.target.value)}
+          disabled={isDisabled}
         />
       </form>
     </header>
